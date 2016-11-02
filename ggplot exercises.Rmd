@@ -1,0 +1,147 @@
+---
+title: "ggplot exercises"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.height=4, fig.width=6)
+library(dplyr)
+library(ggplot2)
+
+nhanes = read.csv("height_gender.csv")
+```
+
+# Bivariate data
+
+## Scatter plots
+
+Scatter plots are easy to make with ggplot!
+
+```{r petal_points}
+ggplot(iris, aes(Petal.Length, Petal.Width)) +
+  geom_point()
+```
+
+You can add additional aesthetics including:
+
+* color
+* shape
+* size
+
+```{r petal_points_by_species}
+ggplot(iris, aes(Petal.Length, Petal.Width, color=Species, shape=Species)) +
+  geom_point()
+```
+
+*Challenge*: from the NHANES data set, make a scatter plot of weight vs height,
+where color indicates sex.
+
+```{r nhanes_height_weight_by_sex}
+
+```
+
+## 2D density plots
+
+Density plots are just as easy to make:
+
+```{r petal_density}
+ggplot(iris, aes(Petal.Length, Petal.Width)) +
+  geom_density2d()
+```
+
+
+*Challenge*: from the NHANES data set, make a density plot of weight vs height,
+where color indicates sex.
+
+```{r nhanes_height_weight_density}
+
+```
+
+# Semicategorical bivariate data
+
+Boxplots are a great way to visualize a continuous variable against a
+categorical variable:
+
+```{r iris_box}
+ggplot(iris, aes(Species, Petal.Length)) +
+  geom_boxplot()
+```
+
+You can also overlay multiple geoms on a single plot:
+
+```{r iris_violin}
+ggplot(iris, aes(Species, Petal.Length)) +
+  geom_violin() +
+  geom_point(position=position_jitter(width=0.2, height=0), alpha=0.5)
+```
+
+*Challenge*: Make a violin plot of height vs sex.
+
+```{r nhanes_box}
+
+```
+
+# Continuous univariate data
+
+Histograms are my favorite kind of plot! They are very hard to make in Excel.
+They are very easy to make with ggplot.
+
+```{r petal_length_density}
+ggplot(iris, aes(Petal.Length)) +
+  geom_histogram(bins=10) +
+  facet_grid(Species~.)
+```
+
+You can also connect the tops of the histogram boxes:
+
+```{r petal_length_freqpoly}
+ggplot(iris, aes(Petal.Length, color=Species)) +
+  geom_freqpoly(binwidth=0.5)
+```
+
+Density plots (the continuous analogue of histograms) are also nice to overlay.
+
+```{r petal_length_density}
+ggplot(iris, aes(Petal.Length, color=Species)) +
+  geom_density()
+```
+
+*Challenge*: Make histograms of height for men and women born in the US and overseas.
+
+```{r nhanes_histo}
+
+```
+
+# Bar plots
+
+Bar charts are actually relatively difficult to make with ggplot2. You shouldn't
+be making them anyway! But you can.
+
+```{r iris_bar_plot}
+
+# You can use ggplot's stat_summary to help you compute the mean of observations
+# for a particular combination of aesthetics.
+
+g = ggplot(iris, aes(Species, Petal.Length)) +
+  stat_summary(fun.y=mean, geom="bar")
+print(g)
+
+# Or you can use dplyr to compute it in advance and use stat_identity. This
+# happens to be much faster for large data sets.
+
+g = iris %>%
+  group_by(Species) %>%
+  summarize(Petal.Length.mean=mean(Petal.Length)) %>%
+  ggplot(aes(Species, Petal.Length.mean)) +
+    geom_bar(stat="identity", width=0.5, fill="blue")
+print(g)
+
+```
+
+
+Challenge: use a bar plot to compare average height for men and women in the
+NHANES data set.
+
+```{r nhanes_bar_plot}
+
+```
